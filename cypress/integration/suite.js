@@ -1,41 +1,39 @@
 import selectors from "../support/selectors.js";
+
 describe("DMI Homepage", () => {
   beforeEach(() => {
     cy.visit("/");
     cy.viewport(1280, 720);
   });
 
-  /* simple sanity test */
-  it.skip("Verify that main logo is visible", () => {
+  /***** 
+  simple assertions test: make a test that checks that satisfies the following
+  1. Main DMI Logo is visible
+  ++++*/
+  it.skip("simple commands + assertions", () => {
     cy.get(selectors.mainLogo).should("be.visible");
-    cy.get(selectors.dgLogo).should("be.visible");
   });
 
-  it.skip("ss", () => {
+  /***** 
+  visual regression: take a screenshot, reload the page take another and then compare the two to verify that they are exactly the same.
+  ++++*/
+  it.skip("visual testing", () => {
     cy.screenshot("homepage", {
       blackout: [selectors.mainLogo],
     });
   });
 
-  it("intercept", () => {
-    cy.get("#menu-item-28194 > a > span").click();
-    cy.get("#field_qh4icy").type("test");
-    cy.get("#field_ocfup1").type("test");
-    cy.get("#field_vouiw8c49614001").type("test");
-    cy.get("#field_sg6vn0293d0ad02").type("test");
-    cy.get("#field_gxhb9aa0cdce2fb").type("5555555555");
-    cy.get("#field_29yf4d").type("test@test.com");
-    cy.get("#field_srb0i").select("Afghanistan");
-    cy.get("#field_kieed").select("Google");
-    cy.get("#field_475qb").select("0-3 months");
-    cy.get("#field_q5oxv").type("this is a test");
-    cy.get("#field_mqclw3326442da3-0").check();
-
+  /***** 
+  intercept: write a test that satisfies the following: 
+  1. add an intercept that prevents network calls to be made to hubspot and returns a mocked response
+  2. navigate to the contact form
+  3. check that request are being intercepted
+  Hint: /^.*\b(hubspot)\b.*$/
+  ++++*/
+  it("cy.intercept", () => {
     cy.intercept(
       {
-        method: "POST",
-        url:
-          "https://app.callrail.com/companies/832775192/998cee22ca8b8bd01202/12/form_capture.json",
+        url: /^.*\b(hubspot)\b.*$/,
       },
       {
         statusCode: 500,
@@ -45,20 +43,20 @@ describe("DMI Homepage", () => {
       }
     ).as("submitForm");
 
-    cy.get(
-      "#form_contact-form > div > fieldset > div > div.frm_submit > button"
-    ).click();
-
-    //#post-31170 > div > div > div > div.fusion-layout-column.fusion_builder_column.fusion-builder-column-0.fusion_builder_column_3_5.\33 _5.fusion-flex-column > div > div > p > strong
+    cy.get("#menu-item-28194 > a > span").click();
 
     cy.wait("@submitForm").should(({ request, response }) => {
       expect(response.statusCode).be.equal(500);
-      cy.log(response.message);
     });
   });
 
-  /* conditional */
-  it.skip("conditional", () => {
+  /***** 
+  conditional testing: write a test that satisfies the following
+  1. Clicks the dismiss button of the cookies message at the bottom of the page only if this message is present
+  2. Checks that the message is in fact not visible if conditional statement was false
+  Notes: keep in mind that you cannot use cypress commands in conditional evaluations, because when not found these cause the whole test to fail
+  ++++*/
+  it.skip("conditional testing", () => {
     cy.get("body").then(($body) => {
       if (
         $body
