@@ -1,0 +1,35 @@
+{
+  "name": "cypress7030",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cypress": "npx cypress open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignaciojmachado/cypress7030.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignaciojmachado/cypress7030/issues"
+  },
+  "homepage": "https://github.com/ignaciojmachado/cypress7030#readme",
+  "devDependencies": {
+    "cypress": "^7.0.1",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-cypress": "^2.11.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-promise": "^4.3.1",
+    "prettier": "2.2.1"
+  },
+  "dependencies": {
+    "pixelmatch": "^5.2.1",
+    "pngjs": "^6.0.0"
+  }
+}
