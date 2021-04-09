@@ -43,16 +43,8 @@ describe("DMI Homepage", () => {
   ++++*/
   it("conditional testing", () => {
     cy.get("body").then(($body) => {
-      //your code here
-      /* HINT:
-      {
-        console.log("TRUE");
-        cy.get(selectors.cookiesDismiss).should("be.visible").click();
-      } else {
-        console.log("FALSE");
-        cy.get(selectors.cookiesDismiss).should("not.be.visible");
-      }
-      */
+      //Your code here
+
     });
   });
 });
