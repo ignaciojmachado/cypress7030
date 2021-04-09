@@ -1,3 +1,4 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 import selectors from "../support/selectors.js";
 
 describe("DMI Homepage", () => {
@@ -10,16 +11,64 @@ describe("DMI Homepage", () => {
   simple assertions test: make a test that checks that satisfies the following
   1. Main DMI Logo is visible
   ++++*/
-  it.skip("simple commands + assertions", () => {
+  it("simple commands + assertions", () => {
     cy.get(selectors.mainLogo).should("be.visible");
   });
 
   /***** 
-  visual regression: take a screenshot, reload the page take another and then compare the two to verify that they are exactly the same.
+  visual regression: take a screenshot blacking out the main banner, reload the page take another. BONUS POINTS: Compare the two to verify that they are exactly the same. (cy.task)
   ++++*/
-  it.skip("visual testing", () => {
-    cy.screenshot("homepage", {
-      blackout: [selectors.mainLogo],
+  describe("visual testing", () => {
+    const failureThreshold = 0;
+    const id = Date.now();
+    const snapshotsDir = `cypress/screenshots/suite.js/${id}`;
+
+    it("should store original image", () => {
+      cy.viewport(1280, 720)
+        .visit("/")
+        .wait(5000)
+        .then(() => {
+          cy.get("html").invoke("css", "height", "initial");
+          cy.get("body").invoke("css", "height", "initial");
+          cy.screenshot(`${id}/original`, {
+            capture: "viewport",
+            timeout: 60000,
+            blackout: [".fusion-builder-row-1"],
+          });
+        });
+    });
+
+    it("should store new image", () => {
+      cy.viewport(1280, 720)
+        .visit("/")
+        .wait(5000)
+        .then(() => {
+          cy.get("html").invoke("css", "height", "initial");
+          cy.get("body").invoke("css", "height", "initial");
+          cy.screenshot(`${id}/new`, {
+            capture: "viewport",
+            timeout: 60000,
+            blackout: [".fusion-builder-row-1"],
+          });
+        });
+    });
+
+    it(`both images should be less than ${
+      failureThreshold * 100
+    }% different`, () => {
+      cy.task("pixelMatch", {
+        failureThresholdType: "percent",
+        snapshotsDir,
+        receivedImageBuffer: `${snapshotsDir}/original.png`,
+        snapshotImageBuffer: `${snapshotsDir}/new.png`,
+        failureThreshold,
+        snapshotIdentifier: `diff`,
+      }).then((result) => {
+        assert(
+          result.diffRatio <= failureThreshold,
+          `Images are ${result.diffRatio}% different`
+        );
+      });
     });
   });
 
@@ -56,7 +105,7 @@ describe("DMI Homepage", () => {
   2. Checks that the message is in fact not visible if conditional statement was false
   Notes: keep in mind that you cannot use cypress commands in conditional evaluations, because when not found these cause the whole test to fail
   ++++*/
-  it.skip("conditional testing", () => {
+  it("conditional testing", () => {
     cy.get("body").then(($body) => {
       if (
         $body
