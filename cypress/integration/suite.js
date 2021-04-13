@@ -11,14 +11,66 @@ describe("DMI Homepage", () => {
   simple assertions test: make a test that checks that satisfies the following
   1. Main DMI Logo is visible
   ++++*/
-
-  //Your code here
+  it("simple commands + assertions", () => {
+    cy.get(selectors.mainLogo).should("be.visible");
+  });
 
   /***** 
-  visual regression: take a screenshot blacking out the main banner, reload the page take another. BONUS POINTS: Compare the two to verify that they are exactly the same (cy.task).
+  visual regression: take a screenshot blacking out the main banner, reload the page take another. BONUS POINTS: Compare the two to verify that they are exactly the same. (cy.task)
   ++++*/
+  describe("visual testing", () => {
+    const failureThreshold = 0;
+    const id = Date.now();
+    const snapshotsDir = `cypress/screenshots/suite.js/${id}`;
 
-  //Your code here
+    it("should store original image", () => {
+      cy.viewport(1280, 720)
+        .visit("/")
+        .wait(5000)
+        .then(() => {
+          cy.get("html").invoke("css", "height", "initial");
+          cy.get("body").invoke("css", "height", "initial");
+          cy.screenshot(`${id}/original`, {
+            capture: "viewport",
+            timeout: 60000,
+            blackout: [selectors.mainLogo],
+          });
+        });
+    });
+
+    it("should store new image", () => {
+      cy.viewport(1280, 720)
+        .visit("/")
+        .wait(5000)
+        .then(() => {
+          cy.get("html").invoke("css", "height", "initial");
+          cy.get("body").invoke("css", "height", "initial");
+          cy.screenshot(`${id}/new`, {
+            capture: "viewport",
+            timeout: 60000,
+            blackout: [selectors.mainLogo],
+          });
+        });
+    });
+
+    it(`both images should be less than ${
+      failureThreshold * 100
+    }% different`, () => {
+      cy.task("pixelMatch", {
+        failureThresholdType: "percent",
+        snapshotsDir,
+        receivedImageBuffer: `${snapshotsDir}/original.png`,
+        snapshotImageBuffer: `${snapshotsDir}/new.png`,
+        failureThreshold,
+        snapshotIdentifier: `diff`,
+      }).then((result) => {
+        assert(
+          result.diffRatio <= failureThreshold,
+          `Images are ${result.diffRatio}% different`
+        );
+      });
+    });
+  });
 
   /***** 
   intercept: write a test that satisfies the following: 
@@ -28,9 +80,21 @@ describe("DMI Homepage", () => {
   Hint: /^.*\b(hubspot)\b.*$/
   ++++*/
   it("cy.intercept", () => {
-    //Your code here, Hint 2: cy.intercept
+    cy.intercept(
+      {
+        url: /^.*\b(hubspot)\b.*$/,
+      },
+      {
+        statusCode: 500,
+        body: { error: "Something went wrong" },
+        headers: { "access-control-allow-origin": "*" },
+        delayMs: 5000,
+      }
+    ).as("submitForm");
 
-    cy.wait("YOUR_REQUEST_HERE").should(({ request, response }) => {
+    cy.get("#menu-item-28194 > a > span").click();
+
+    cy.wait("@submitForm").should(({ request, response }) => {
       expect(response.statusCode).be.equal(500);
     });
   });
@@ -43,8 +107,19 @@ describe("DMI Homepage", () => {
   ++++*/
   it("conditional testing", () => {
     cy.get("body").then(($body) => {
-      //Your code here
-
+      if (
+        $body
+          .text()
+          .includes(
+            "This website uses cookies to ensure you get the best experience on our website"
+          )
+      ) {
+        console.log("TRUE");
+        cy.get(selectors.cookiesDismiss).should("be.visible").click();
+      } else {
+        console.log("FALSE");
+        cy.get(selectors.cookiesDismiss).should("not.be.visible");
+      }
     });
   });
 });
